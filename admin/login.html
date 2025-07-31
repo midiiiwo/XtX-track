@@ -114,18 +114,43 @@
         const password = document.getElementById("password").value;
 
         try {
-          // Wait for backend to initialize
-          if (!window.backend) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-          }
+          // Try PHP API first
+          const response = await fetch("../api/admin.php?path=login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          });
 
-          const session = window.backend.authenticateAdmin(username, password);
+          const result = await response.json();
 
-          if (session) {
+          if (result.success) {
             window.location.href = "dashboard.html";
-          } else {
-            alert("Invalid credentials. Please try again.");
+            return;
           }
+        } catch (error) {
+          console.warn("PHP API not available, trying fallback:", error);
+        }
+
+        try {
+          // Fallback to JavaScript backend
+          if (!window.backend) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
+          }
+
+          if (window.backend) {
+            const session = window.backend.authenticateAdmin(
+              username,
+              password
+            );
+            if (session) {
+              window.location.href = "dashboard.html";
+              return;
+            }
+          }
+
+          alert("Invalid credentials. Please try again.");
         } catch (error) {
           console.error("Login error:", error);
           alert("Login failed. Please try again.");

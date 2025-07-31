@@ -100,7 +100,25 @@ async function trackShipment() {
     return;
   }
 
-  // Wait for backend to initialize if it exists
+  try {
+    // Try PHP API first
+    const response = await fetch(
+      `api/shipments.php?path=track&tracking=${encodeURIComponent(
+        trackingNumber
+      )}`
+    );
+    const result = await response.json();
+
+    if (result.success && result.shipment) {
+      const trackingData = convertShipmentToTrackingData(result.shipment);
+      displayTrackingResults(trackingData);
+      return;
+    }
+  } catch (error) {
+    console.warn("PHP API not available, trying fallback:", error);
+  }
+
+  // Fallback to JavaScript backend if available
   if (window.backend) {
     while (!window.backend) {
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -110,17 +128,16 @@ async function trackShipment() {
     if (shipment) {
       const trackingData = convertShipmentToTrackingData(shipment);
       displayTrackingResults(trackingData);
-    } else {
-      displayTrackingError();
+      return;
     }
+  }
+
+  // Final fallback to sample data
+  const trackingData = sampleTrackingData[trackingNumber];
+  if (trackingData) {
+    displayTrackingResults(trackingData);
   } else {
-    // Fallback to sample data if backend not available
-    const trackingData = sampleTrackingData[trackingNumber];
-    if (trackingData) {
-      displayTrackingResults(trackingData);
-    } else {
-      displayTrackingError();
-    }
+    displayTrackingError();
   }
 }
 

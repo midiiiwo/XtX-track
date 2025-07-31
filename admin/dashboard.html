@@ -73,7 +73,7 @@
             <button onclick="showNewShipment()" class="btn btn-primary">
               New Shipment
             </button>
-            <button onclick="bulkUpdate()" class="btn btn-secondary">
+            <!-- <button onclick="bulkUpdate()" class="btn btn-secondary">
               Bulk Update
             </button>
             <button onclick="generateReport()" class="btn btn-secondary">
@@ -81,7 +81,7 @@
             </button>
             <button onclick="exportData()" class="btn btn-secondary">
               Export Data
-            </button>
+            </button> -->
           </div>
         </section>
 
@@ -458,7 +458,7 @@
           .reset();
       }
 
-      function saveNewShipment(event) {
+      async function saveNewShipment(event) {
         event.preventDefault();
 
         try {
@@ -474,15 +474,41 @@
             eta: document.getElementById("newETA").value,
           };
 
-          const newShipment = window.backend.createShipment(
-            shipmentData,
-            currentSession
-          );
-          alert(
-            `Shipment created successfully! Tracking Number: ${newShipment.trackingNumber}`
-          );
-          closeNewShipmentModal();
-          loadDashboardData(); // Refresh data
+          // Try PHP API first
+          try {
+            const response = await fetch("../api/shipments.php?path=create", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(shipmentData),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+              alert(
+                `Shipment created successfully! Tracking Number: ${result.shipment.trackingNumber}`
+              );
+              closeNewShipmentModal();
+              loadDashboardData();
+              return;
+            }
+          } catch (apiError) {
+            console.warn("PHP API not available, using fallback:", apiError);
+          }
+
+          // Fallback to JavaScript backend
+          if (window.backend) {
+            const newShipment = window.backend.createShipment(
+              shipmentData,
+              currentSession
+            );
+            alert(
+              `Shipment created successfully! Tracking Number: ${newShipment.trackingNumber}`
+            );
+            closeNewShipmentModal();
+            loadDashboardData(); // Refresh data
+          }
         } catch (error) {
           alert("Error creating shipment: " + error.message);
         }
@@ -502,7 +528,29 @@
       });
 
       async function checkAuth() {
-        // Wait for backend to initialize
+        try {
+          // Try PHP API first
+          const response = await fetch("../api/admin.php?path=session");
+          const result = await response.json();
+
+          if (result.success) {
+            currentSession = result.session;
+            // Update UI with user info
+            document.querySelector(
+              ".admin-user span"
+            ).textContent = `Welcome, ${currentSession.username}`;
+
+            // Show admin management button for supaadmin
+            if (currentSession.role === "supaadmin") {
+              addAdminManagementButton();
+            }
+            return;
+          }
+        } catch (error) {
+          console.warn("PHP API not available, trying fallback:", error);
+        }
+
+        // Fallback to JavaScript backend
         while (!window.backend) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
@@ -528,20 +576,44 @@
         const quickActions = document.querySelector(".action-buttons");
         const adminBtn = document.createElement("button");
         adminBtn.textContent = "Manage Admins";
-        adminBtn.className = "btn btn-secondary";
+        adminBtn.className = "btn btn-primary";
         adminBtn.onclick = showAdminManagement;
         quickActions.appendChild(adminBtn);
       }
 
       async function loadDashboardData() {
         try {
-          // Load dashboard stats
-          const stats = window.backend.getDashboardStats();
-          updateDashboardStats(stats);
+          // Try PHP API first
+          try {
+            const statsResponse = await fetch(
+              "../api/shipments.php?path=stats"
+            );
+            const statsResult = await statsResponse.json();
+            if (statsResult.success) {
+              updateDashboardStats(statsResult.stats);
+            }
 
-          // Load shipments
-          allShipments = window.backend.getAllShipments();
-          displayShipments(allShipments);
+            const shipmentsResponse = await fetch(
+              "../api/shipments.php?path=all"
+            );
+            const shipmentsResult = await shipmentsResponse.json();
+            if (shipmentsResult.success) {
+              allShipments = shipmentsResult.shipments;
+              displayShipments(allShipments);
+              return;
+            }
+          } catch (apiError) {
+            console.warn("PHP API not available, using fallback:", apiError);
+          }
+
+          // Fallback to JavaScript backend
+          if (window.backend) {
+            const stats = window.backend.getDashboardStats();
+            updateDashboardStats(stats);
+
+            allShipments = window.backend.getAllShipments();
+            displayShipments(allShipments);
+          }
         } catch (error) {
           console.error("Error loading dashboard data:", error);
         }
@@ -615,8 +687,19 @@
         return statusMap[status] || status;
       }
 
-      function adminLogout() {
-        window.backend.logout();
+      async function adminLogout() {
+        try {
+          // Try PHP API first
+          await fetch("../api/admin.php?path=logout", { method: "POST" });
+        } catch (error) {
+          console.warn("PHP API not available for logout:", error);
+        }
+
+        // Also clear JavaScript backend session if available
+        if (window.backend) {
+          window.backend.logout();
+        }
+
         window.location.href = "login.html";
       }
 

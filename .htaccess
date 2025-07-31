@@ -1,0 +1,45 @@
+RewriteEngine On
+
+# Enable PHP execution
+
+Options +ExecCGI
+AddHandler php8-script .php
+
+# Allow CORS for API endpoints
+
+Header always set Access-Control-Allow-Origin "\*"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+# Handle API routing
+
+RewriteRule ^api/([^/]+)\.php$ api/$1.php [L,QSA]
+
+# Handle index file
+
+DirectoryIndex index.html
+
+# Security headers
+
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+
+# Cache static assets
+
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
+ExpiresActive On
+ExpiresDefault "access plus 1 month"
+</FilesMatch>
+
+# Prevent access to sensitive files
+
+<FilesMatch "\.(json|md|txt|log)$">
+Require all denied
+</FilesMatch>
+
+# Exception for API access to JSON files
+
+<FilesMatch "^db/.\*\.json$">
+Require all granted
+</FilesMatch>

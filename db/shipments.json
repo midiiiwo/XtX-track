@@ -1,144 +1,168 @@
 {
-  "shipments": [
-    {
-      "id": "1",
-      "trackingNumber": "GS-2025-001234",
-      "client": "Marcus Chen",
-      "description": "24k Gold Bars (5kg)",
-      "origin": "Accra Vault Facility, Ghana",
-      "destination": "London Secure Vault, UK",
-      "status": "transit",
-      "value": 325000,
-      "currency": "USD",
-      "serviceType": "Express International Shipping",
-      "eta": "2025-07-27",
-      "createdAt": "2025-07-22T10:00:00.000Z",
-      "updatedAt": "2025-07-25T14:00:00.000Z",
-      "timeline": [
+    "shipments": [
         {
-          "status": "storage",
-          "location": "Accra Vault Facility",
-          "timestamp": "2025-07-22T10:00:00.000Z",
-          "description": "Gold received and verified in secure vault",
-          "notes": "Initial storage confirmation"
+            "id": "1",
+            "trackingNumber": "GS-2025-001234",
+            "client": "Marcus Chen",
+            "description": "24k Gold Bars (5kg)",
+            "origin": "Accra Vault Facility, Ghana",
+            "destination": "London Secure Vault, UK",
+            "status": "transit",
+            "value": 325000,
+            "currency": "USD",
+            "serviceType": "Express International Shipping",
+            "eta": "2025-07-27",
+            "createdAt": "2025-07-22T10:00:00.000Z",
+            "updatedAt": "2025-07-25T14:00:00.000Z",
+            "timeline": [
+                {
+                    "status": "storage",
+                    "location": "Accra Vault Facility",
+                    "timestamp": "2025-07-22T10:00:00.000Z",
+                    "description": "Gold received and verified in secure vault",
+                    "notes": "Initial storage confirmation"
+                },
+                {
+                    "status": "preparing",
+                    "location": "Accra Processing Center",
+                    "timestamp": "2025-07-24T14:30:00.000Z",
+                    "description": "Documentation completed, customs clearance obtained",
+                    "notes": "Ready for shipment"
+                },
+                {
+                    "status": "transit",
+                    "location": "DHL Express International",
+                    "timestamp": "2025-07-25T14:00:00.000Z",
+                    "description": "Departed Accra - Next stop: London Heathrow",
+                    "notes": "In transit to destination"
+                }
+            ]
         },
         {
-          "status": "preparing",
-          "location": "Accra Processing Center",
-          "timestamp": "2025-07-24T14:30:00.000Z",
-          "description": "Documentation completed, customs clearance obtained",
-          "notes": "Ready for shipment"
+            "id": "2",
+            "trackingNumber": "GS-2025-005678",
+            "client": "Sarah Williams",
+            "description": "Gold Coins Collection (500 pieces)",
+            "origin": "Dubai Secure Storage, UAE",
+            "destination": "New York Vault, USA",
+            "status": "preparing",
+            "value": 180000,
+            "currency": "USD",
+            "serviceType": "Standard International Shipping",
+            "eta": "2025-07-30",
+            "createdAt": "2025-07-23T08:00:00.000Z",
+            "updatedAt": "2025-07-24T10:00:00.000Z",
+            "timeline": [
+                {
+                    "status": "storage",
+                    "location": "Dubai Secure Storage",
+                    "timestamp": "2025-07-23T08:00:00.000Z",
+                    "description": "Gold coins received and catalogued",
+                    "notes": "500 pieces verified"
+                },
+                {
+                    "status": "preparing",
+                    "location": "Dubai Processing Center",
+                    "timestamp": "2025-07-24T10:00:00.000Z",
+                    "description": "Preparing documentation for US customs",
+                    "notes": "Customs forms in progress"
+                }
+            ]
         },
         {
-          "status": "transit",
-          "location": "DHL Express International",
-          "timestamp": "2025-07-25T14:00:00.000Z",
-          "description": "Departed Accra - Next stop: London Heathrow",
-          "notes": "In transit to destination"
+            "id": "3",
+            "trackingNumber": "GS-2025-009876",
+            "client": "James Rodriguez",
+            "description": "Investment Gold Bars (10kg)",
+            "origin": "Singapore Vault, Singapore",
+            "destination": "Zurich Storage Facility, Switzerland",
+            "status": "delivered",
+            "value": 650000,
+            "currency": "USD",
+            "serviceType": "Premium Secure Transport",
+            "eta": "2025-07-20",
+            "createdAt": "2025-07-15T09:00:00.000Z",
+            "updatedAt": "2025-07-20T16:00:00.000Z",
+            "timeline": [
+                {
+                    "status": "storage",
+                    "location": "Singapore Vault",
+                    "timestamp": "2025-07-15T09:00:00.000Z",
+                    "description": "Gold bars received and secured",
+                    "notes": "10kg premium gold bars"
+                },
+                {
+                    "status": "preparing",
+                    "location": "Singapore Processing",
+                    "timestamp": "2025-07-16T11:00:00.000Z",
+                    "description": "Premium transport arranged",
+                    "notes": "Armored vehicle scheduled"
+                },
+                {
+                    "status": "transit",
+                    "location": "Secure Air Transport",
+                    "timestamp": "2025-07-18T06:00:00.000Z",
+                    "description": "En route to Zurich",
+                    "notes": "Premium security transport"
+                },
+                {
+                    "status": "delivered",
+                    "location": "Zurich Storage Facility",
+                    "timestamp": "2025-07-20T16:00:00.000Z",
+                    "description": "Successfully delivered and secured",
+                    "notes": "Delivery confirmed by client"
+                }
+            ]
+        },
+        {
+            "id": "4",
+            "trackingNumber": "GS-2025-011223",
+            "client": "Emma Thompson",
+            "description": "Jewelry Collection",
+            "origin": "London, UK",
+            "destination": "Los Angeles, US",
+            "status": "storage",
+            "value": 95000,
+            "currency": "USD",
+            "serviceType": "Standard International Shipping",
+            "eta": "2025-08-05",
+            "createdAt": "2025-07-29T15:00:00.000Z",
+            "updatedAt": "2025-07-29T15:00:00.000Z",
+            "timeline": [
+                {
+                    "status": "storage",
+                    "location": "London Secure Vault",
+                    "timestamp": "2025-07-29T15:00:00.000Z",
+                    "description": "Jewelry collection received and catalogued",
+                    "notes": "High-value jewelry pieces secured"
+                }
+            ]
+        },
+        {
+            "id": "5",
+            "trackingNumber": "GS-2025-011224",
+            "client": "test kwansa",
+            "description": "nbfvdcsx",
+            "origin": "nbfvdc",
+            "destination": " nbfvcx",
+            "status": "storage",
+            "value": 400,
+            "currency": "USD",
+            "serviceType": "Express International Shipping",
+            "eta": "2025-07-31",
+            "createdAt": "2025-07-31T12:51:38+00:00",
+            "updatedAt": "2025-07-31T12:51:38+00:00",
+            "timeline": [
+                {
+                    "status": "storage",
+                    "location": "nbfvdc",
+                    "timestamp": "2025-07-31T12:51:38+00:00",
+                    "description": "Shipment created",
+                    "notes": "Initial shipment entry"
+                }
+            ]
         }
-      ]
-    },
-    {
-      "id": "2",
-      "trackingNumber": "GS-2025-005678",
-      "client": "Sarah Williams",
-      "description": "Gold Coins Collection (500 pieces)",
-      "origin": "Dubai Secure Storage, UAE",
-      "destination": "New York Vault, USA",
-      "status": "preparing",
-      "value": 180000,
-      "currency": "USD",
-      "serviceType": "Standard International Shipping",
-      "eta": "2025-07-30",
-      "createdAt": "2025-07-23T08:00:00.000Z",
-      "updatedAt": "2025-07-24T10:00:00.000Z",
-      "timeline": [
-        {
-          "status": "storage",
-          "location": "Dubai Secure Storage",
-          "timestamp": "2025-07-23T08:00:00.000Z",
-          "description": "Gold coins received and catalogued",
-          "notes": "500 pieces verified"
-        },
-        {
-          "status": "preparing",
-          "location": "Dubai Processing Center",
-          "timestamp": "2025-07-24T10:00:00.000Z",
-          "description": "Preparing documentation for US customs",
-          "notes": "Customs forms in progress"
-        }
-      ]
-    },
-    {
-      "id": "3",
-      "trackingNumber": "GS-2025-009876",
-      "client": "James Rodriguez",
-      "description": "Investment Gold Bars (10kg)",
-      "origin": "Singapore Vault, Singapore",
-      "destination": "Zurich Storage Facility, Switzerland",
-      "status": "delivered",
-      "value": 650000,
-      "currency": "USD",
-      "serviceType": "Premium Secure Transport",
-      "eta": "2025-07-20",
-      "createdAt": "2025-07-15T09:00:00.000Z",
-      "updatedAt": "2025-07-20T16:00:00.000Z",
-      "timeline": [
-        {
-          "status": "storage",
-          "location": "Singapore Vault",
-          "timestamp": "2025-07-15T09:00:00.000Z",
-          "description": "Gold bars received and secured",
-          "notes": "10kg premium gold bars"
-        },
-        {
-          "status": "preparing",
-          "location": "Singapore Processing",
-          "timestamp": "2025-07-16T11:00:00.000Z",
-          "description": "Premium transport arranged",
-          "notes": "Armored vehicle scheduled"
-        },
-        {
-          "status": "transit",
-          "location": "Secure Air Transport",
-          "timestamp": "2025-07-18T06:00:00.000Z",
-          "description": "En route to Zurich",
-          "notes": "Premium security transport"
-        },
-        {
-          "status": "delivered",
-          "location": "Zurich Storage Facility",
-          "timestamp": "2025-07-20T16:00:00.000Z",
-          "description": "Successfully delivered and secured",
-          "notes": "Delivery confirmed by client"
-        }
-      ]
-    },
-    {
-      "id": "4",
-      "trackingNumber": "GS-2025-011223",
-      "client": "Emma Thompson",
-      "description": "Jewelry Collection",
-      "origin": "London, UK",
-      "destination": "Los Angeles, US",
-      "status": "storage",
-      "value": 95000,
-      "currency": "USD",
-      "serviceType": "Standard International Shipping",
-      "eta": "2025-08-05",
-      "createdAt": "2025-07-29T15:00:00.000Z",
-      "updatedAt": "2025-07-29T15:00:00.000Z",
-      "timeline": [
-        {
-          "status": "storage",
-          "location": "London Secure Vault",
-          "timestamp": "2025-07-29T15:00:00.000Z",
-          "description": "Jewelry collection received and catalogued",
-          "notes": "High-value jewelry pieces secured"
-        }
-      ]
-    }
-  ],
-  "nextTrackingId": 11224,
-  "lastUpdated": "2025-07-31T00:00:00.000Z"
+    ],
+    "nextTrackingId": 11225,
+    "lastUpdated": "2025-07-31T12:51:38+00:00"
 }
