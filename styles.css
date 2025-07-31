@@ -265,7 +265,7 @@ body {
 
 .btn-secondary {
   background: transparent;
-  color: var(--white);
+  color: var(--dark-secondary);
   border: 2px solid var(--primary-gold);
 }
 
