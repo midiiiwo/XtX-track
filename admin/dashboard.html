@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Athena Security</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="dashboard-body">
+    <!-- Admin Header -->
+    <header class="admin-header">
+      <div class="admin-nav">
+        <div class="admin-logo">
+          <img alt="gg" src="./ll.png" />
+          <!-- <span class="logo-text">Athena</span> -->
+        </div>
+        <div class="admin-user">
+          <span>Welcome, Admin</span>
+          <button onclick="adminLogout()" class="btn btn-secondary btn-sm">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-main">
+      <div class="dashboard-container">
+        <!-- Dashboard Stats -->
+        <section class="dashboard-stats">
+          <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-content">
+              <h3>Total Shipments</h3>
+              <p class="stat-number">2,847</p>
+              <p class="stat-change">+12% this month</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🚚</div>
+            <div class="stat-content">
+              <h3>In Transit</h3>
+              <p class="stat-number">156</p>
+              <p class="stat-change">-3% from last week</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+              <h3>Delivered</h3>
+              <p class="stat-number">2,631</p>
+              <p class="stat-change">+8% this month</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-content">
+              <h3>Total Value</h3>
+              <p class="stat-number">$2.5M</p>
+              <p class="stat-change">+15% this month</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+          <h2>Quick Actions</h2>
+          <div class="action-buttons">
+            <button onclick="showNewShipment()" class="btn btn-primary">
+              New Shipment
+            </button>
+            <button onclick="bulkUpdate()" class="btn btn-secondary">
+              Bulk Update
+            </button>
+            <button onclick="generateReport()" class="btn btn-secondary">
+              Generate Report
+            </button>
+            <button onclick="exportData()" class="btn btn-secondary">
+              Export Data
+            </button>
+          </div>
+        </section>
+
+        <!-- Shipments Management -->
+        <section class="shipments-management">
+          <div class="section-header">
+            <h2>Shipment Management</h2>
+            <div class="section-controls">
+              <input
+                type="text"
+                placeholder="Search shipments..."
+                class="search-input"
+                oninput="filterShipments(this.value)"
+              />
+              <select
+                onchange="filterByStatus(this.value)"
+                class="filter-select"
+              >
+                <option value="">All Statuses</option>
+                <option value="storage">In Storage</option>
+                <option value="preparing">Preparing</option>
+                <option value="transit">In Transit</option>
+                <option value="delivered">Delivered</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="shipments-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tracking #</th>
+                  <th>Client</th>
+                  <th>Description</th>
+                  <th>Origin</th>
+                  <th>Destination</th>
+                  <th>Status</th>
+                  <th>Value</th>
+                  <th>ETA</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="shipmentsTableBody">
+                <tr>
+                  <td><strong>GS-2025-001234</strong></td>
+                  <td>Marcus Chen</td>
+                  <td>24k Gold Bars (5kg)</td>
+                  <td>Accra, GH</td>
+                  <td>London, UK</td>
+                  <td>
+                    <span class="status-badge in-transit">In Transit</span>
+                  </td>
+                  <td>$325,000</td>
+                  <td>Jul 27, 2025</td>
+                  <td>
+                    <button
+                      onclick="editShipment('GS-2025-001234')"
+                      class="btn-action"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onclick="updateStatus('GS-2025-001234')"
+                      class="btn-action"
+                    >
+                      Update
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>GS-2025-005678</strong></td>
+                  <td>Sarah Williams</td>
+                  <td>Gold Coins Collection</td>
+                  <td>Dubai, AE</td>
+                  <td>New York, US</td>
+                  <td><span class="status-badge preparing">Preparing</span></td>
+                  <td>$180,000</td>
+                  <td>Jul 30, 2025</td>
+                  <td>
+                    <button
+                      onclick="editShipment('GS-2025-005678')"
+                      class="btn-action"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onclick="updateStatus('GS-2025-005678')"
+                      class="btn-action"
+                    >
+                      Update
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>GS-2025-009876</strong></td>
+                  <td>James Rodriguez</td>
+                  <td>Investment Gold (10kg)</td>
+                  <td>Singapore, SG</td>
+                  <td>Zurich, CH</td>
+                  <td><span class="status-badge delivered">Delivered</span></td>
+                  <td>$650,000</td>
+                  <td>Delivered</td>
+                  <td>
+                    <button
+                      onclick="editShipment('GS-2025-009876')"
+                      class="btn-action"
+                    >
+                      View
+                    </button>
+                    <button
+                      onclick="generateInvoice('GS-2025-009876')"
+                      class="btn-action"
+                    >
+                      Invoice
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>GS-2025-011223</strong></td>
+                  <td>Emma Thompson</td>
+                  <td>Jewelry Collection</td>
+                  <td>London, UK</td>
+                  <td>Los Angeles, US</td>
+                  <td><span class="status-badge storage">In Storage</span></td>
+                  <td>$95,000</td>
+                  <td>Aug 5, 2025</td>
+                  <td>
+                    <button
+                      onclick="editShipment('GS-2025-011223')"
+                      class="btn-action"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onclick="updateStatus('GS-2025-011223')"
+                      class="btn-action"
+                    >
+                      Update
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Edit Shipment Modal -->
+    <div class="modal" id="editShipmentModal" style="display: none">
+      <div class="modal-content large">
+        <div class="modal-header">
+          <h2>Edit Shipment</h2>
+          <button class="modal-close" onclick="closeEditModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <form onsubmit="saveShipment(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="editTrackingNumber">Tracking Number</label>
+                <input type="text" id="editTrackingNumber" readonly />
+              </div>
+              <div class="form-group">
+                <label for="editClient">Client Name</label>
+                <input type="text" id="editClient" required />
+              </div>
+              <div class="form-group">
+                <label for="editDescription">Description</label>
+                <input type="text" id="editDescription" required />
+              </div>
+              <div class="form-group">
+                <label for="editOrigin">Origin</label>
+                <input type="text" id="editOrigin" required />
+              </div>
+              <div class="form-group">
+                <label for="editDestination">Destination</label>
+                <input type="text" id="editDestination" required />
+              </div>
+              <div class="form-group">
+                <label for="editStatus">Status</label>
+                <select id="editStatus" required>
+                  <option value="storage">In Storage</option>
+                  <option value="preparing">Preparing</option>
+                  <option value="transit">In Transit</option>
+                  <option value="delivered">Delivered</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="editValue">Value ($)</label>
+                <input type="number" id="editValue" required />
+              </div>
+              <div class="form-group">
+                <label for="editETA">ETA</label>
+                <input type="date" id="editETA" required />
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button
+                type="button"
+                onclick="closeEditModal()"
+                class="btn btn-secondary"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="updateStatusModal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Update Shipment Status</h2>
+          <button class="modal-close" onclick="closeStatusModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <form onsubmit="saveStatusUpdate(event)">
+            <div class="form-group">
+              <label for="statusTrackingNumber">Tracking Number</label>
+              <input type="text" id="statusTrackingNumber" readonly />
+            </div>
+            <div class="form-group">
+              <label for="newStatus">New Status</label>
+              <select id="newStatus" required>
+                <option value="storage">In Storage</option>
+                <option value="preparing">Preparing</option>
+                <option value="transit">In Transit</option>
+                <option value="delivered">Delivered</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="statusLocation">Current Location</label>
+              <input
+                type="text"
+                id="statusLocation"
+                placeholder="e.g., London Heathrow Airport"
+              />
+            </div>
+            <div class="form-group">
+              <label for="statusNotes">Update Notes</label>
+              <textarea
+                id="statusNotes"
+                rows="3"
+                placeholder="Add any additional notes about this status update..."
+              ></textarea>
+            </div>
+            <div class="modal-actions">
+              <button
+                type="button"
+                onclick="closeStatusModal()"
+                class="btn btn-secondary"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Update Status
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+      if (!localStorage.getItem("adminLoggedIn")) {
+        window.location.href = "login.html";
+      }
+
+      function adminLogout() {
+        localStorage.removeItem("adminLoggedIn");
+        localStorage.removeItem("adminUsername");
+        window.location.href = "login.html";
+      }
+
+      function editShipment(trackingNumber) {
+        // Populate modal with shipment data (demo data)
+        document.getElementById("editTrackingNumber").value = trackingNumber;
+        document.getElementById("editClient").value = "Marcus Chen";
+        document.getElementById("editDescription").value =
+          "24k Gold Bars (5kg)";
+        document.getElementById("editOrigin").value = "Accra, GH";
+        document.getElementById("editDestination").value = "London, UK";
+        document.getElementById("editStatus").value = "transit";
+        document.getElementById("editValue").value = "325000";
+        document.getElementById("editETA").value = "2025-07-27";
+
+        document.getElementById("editShipmentModal").style.display = "flex";
+      }
+
+      function updateStatus(trackingNumber) {
+        document.getElementById("statusTrackingNumber").value = trackingNumber;
+        document.getElementById("updateStatusModal").style.display = "flex";
+      }
+
+      function closeEditModal() {
+        document.getElementById("editShipmentModal").style.display = "none";
+      }
+
+      function closeStatusModal() {
+        document.getElementById("updateStatusModal").style.display = "none";
+      }
+
+      function saveShipment(event) {
+        event.preventDefault();
+        alert("Shipment updated successfully!");
+        closeEditModal();
+      }
+
+      function saveStatusUpdate(event) {
+        event.preventDefault();
+        alert("Status updated successfully!");
+        closeStatusModal();
+      }
+
+      function filterShipments(searchTerm) {
+        console.log("Searching for:", searchTerm);
+      }
+
+      function filterByStatus(status) {
+        console.log("Filtering by status:", status);
+      }
+
+      function showNewShipment() {
+        alert("New Shipment form would open here");
+      }
+
+      function bulkUpdate() {
+        alert("Bulk update functionality would be available here");
+      }
+
+      function generateReport() {
+        alert("Report generation would start here");
+      }
+
+      function exportData() {
+        alert("Data export would begin here");
+      }
+
+      function generateInvoice(trackingNumber) {
+        alert("Invoice generated for " + trackingNumber);
+      }
+    </script>
+  </body>
+</html>
