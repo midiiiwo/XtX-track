@@ -187,7 +187,6 @@
     </div>
 
     <script src="../script.js"></script>
-    <script src="../js/backend.js"></script>
     <script>
       let currentSession = null;
       let allAdmins = [];
@@ -201,11 +200,10 @@
 
       async function checkAuth() {
         try {
-          // Try PHP API first
           const response = await fetch("../api/admin.php?path=session");
           const result = await response.json();
 
-          if (result.success) {
+          if (result.success && result.session) {
             currentSession = result.session;
 
             // Only supaadmin can access this page
@@ -217,48 +215,27 @@
             return;
           }
         } catch (error) {
-          console.warn("PHP API not available, trying fallback:", error);
+          console.error("Authentication check failed:", error);
         }
 
-        // Fallback to JavaScript backend
-        while (!window.backend) {
-          await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-
-        currentSession = window.backend.getCurrentSession();
-        if (!currentSession) {
-          window.location.href = "login.html";
-          return;
-        }
-
-        // Only supaadmin can access this page
-        if (currentSession.role !== "supaadmin") {
-          alert("Unauthorized: Only super admin can manage administrators");
-          window.location.href = "dashboard.html";
-          return;
-        }
+        // Redirect to login if authentication failed
+        alert("Authentication failed. Please log in again.");
+        window.location.href = "login.html";
       }
 
       async function loadAdminsData() {
         try {
-          // Try PHP API first
-          try {
-            const response = await fetch("../api/admin.php?path=all");
-            const result = await response.json();
+          const response = await fetch("../api/admin.php?path=all");
+          const result = await response.json();
 
-            if (result.success) {
-              allAdmins = result.admins;
-              displayAdmins(allAdmins);
-              return;
-            }
-          } catch (apiError) {
-            console.warn("PHP API not available, using fallback:", apiError);
-          }
-
-          // Fallback to JavaScript backend
-          if (window.backend) {
-            allAdmins = window.backend.getAllAdmins(currentSession);
+          if (result.success) {
+            allAdmins = result.admins;
             displayAdmins(allAdmins);
+          } else {
+            alert(
+              "Error loading administrator data: " +
+                (result.message || "Unknown error")
+            );
           }
         } catch (error) {
           console.error("Error loading admins data:", error);
@@ -336,39 +313,28 @@
             role: document.getElementById("newAdminRole").value,
           };
 
-          // Try PHP API first
-          try {
-            const response = await fetch("../api/admin.php?path=create", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(adminData),
-            });
+          const response = await fetch("../api/admin.php?path=create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(adminData),
+          });
 
-            const result = await response.json();
-            if (result.success) {
-              alert(
-                `Administrator "${result.admin.username}" created successfully!`
-              );
-              closeAddAdminModal();
-              loadAdminsData();
-              return;
-            } else {
-              throw new Error(result.error || "Failed to create admin");
-            }
-          } catch (apiError) {
-            console.warn("PHP API not available, using fallback:", apiError);
-          }
-
-          // Fallback to JavaScript backend
-          if (window.backend) {
-            const newAdmin = window.backend.addAdmin(adminData, currentSession);
-            alert(`Administrator "${newAdmin.username}" created successfully!`);
+          const result = await response.json();
+          if (result.success) {
+            alert(
+              `Administrator "${result.admin.username}" created successfully!`
+            );
             closeAddAdminModal();
-            loadAdminsData(); // Refresh data
+            loadAdminsData();
+          } else {
+            alert(
+              "Error creating admin: " + (result.message || "Unknown error")
+            );
           }
         } catch (error) {
+          console.error("Error creating admin:", error);
           alert("Error creating admin: " + error.message);
         }
       }
@@ -388,36 +354,22 @@
         if (!adminToDelete) return;
 
         try {
-          // Try PHP API first
-          try {
-            const response = await fetch(
-              `../api/admin.php?path=delete&id=${adminToDelete}`,
-              {
-                method: "DELETE",
-              }
-            );
+          const response = await fetch(`../api/admin.php?id=${adminToDelete}`, {
+            method: "DELETE",
+          });
 
-            const result = await response.json();
-            if (result.success) {
-              alert("Administrator deleted successfully!");
-              closeConfirmDeleteModal();
-              loadAdminsData();
-              return;
-            } else {
-              throw new Error(result.error || "Failed to delete admin");
-            }
-          } catch (apiError) {
-            console.warn("PHP API not available, using fallback:", apiError);
-          }
-
-          // Fallback to JavaScript backend
-          if (window.backend) {
-            window.backend.deleteAdmin(adminToDelete, currentSession);
+          const result = await response.json();
+          if (result.success) {
             alert("Administrator deleted successfully!");
             closeConfirmDeleteModal();
-            loadAdminsData(); // Refresh data
+            loadAdminsData();
+          } else {
+            alert(
+              "Error deleting admin: " + (result.message || "Unknown error")
+            );
           }
         } catch (error) {
+          console.error("Error deleting admin:", error);
           alert("Error deleting admin: " + error.message);
         }
       }
@@ -458,15 +410,9 @@
 
       async function adminLogout() {
         try {
-          // Try PHP API first
           await fetch("../api/admin.php?path=logout", { method: "POST" });
         } catch (error) {
-          console.warn("PHP API not available for logout:", error);
-        }
-
-        // Also clear JavaScript backend session if available
-        if (window.backend) {
-          window.backend.logout();
+          console.warn("Logout API call failed:", error);
         }
 
         window.location.href = "login.html";

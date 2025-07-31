@@ -474,49 +474,34 @@
             eta: document.getElementById("newETA").value,
           };
 
-          // Try PHP API first
-          try {
-            const response = await fetch("../api/shipments.php?path=create", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(shipmentData),
-            });
+          const response = await fetch("../api/shipments.php?path=create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(shipmentData),
+          });
 
-            const result = await response.json();
-            if (result.success) {
-              alert(
-                `Shipment created successfully! Tracking Number: ${result.shipment.trackingNumber}`
-              );
-              closeNewShipmentModal();
-              loadDashboardData();
-              return;
-            }
-          } catch (apiError) {
-            console.warn("PHP API not available, using fallback:", apiError);
-          }
-
-          // Fallback to JavaScript backend
-          if (window.backend) {
-            const newShipment = window.backend.createShipment(
-              shipmentData,
-              currentSession
-            );
+          const result = await response.json();
+          if (result.success) {
             alert(
-              `Shipment created successfully! Tracking Number: ${newShipment.trackingNumber}`
+              `Shipment created successfully! Tracking Number: ${result.shipment.trackingNumber}`
             );
             closeNewShipmentModal();
-            loadDashboardData(); // Refresh data
+            loadDashboardData();
+          } else {
+            alert(
+              "Error creating shipment: " + (result.message || "Unknown error")
+            );
           }
         } catch (error) {
+          console.error("Error creating shipment:", error);
           alert("Error creating shipment: " + error.message);
         }
       }
     </script>
 
     <script src="../script.js"></script>
-    <script src="../js/backend.js"></script>
     <script>
       let currentSession = null;
       let allShipments = [];
@@ -529,11 +514,11 @@
 
       async function checkAuth() {
         try {
-          // Try PHP API first
+          // Use only PHP API
           const response = await fetch("../api/admin.php?path=session");
           const result = await response.json();
 
-          if (result.success) {
+          if (result.success && result.session) {
             currentSession = result.session;
             // Update UI with user info
             document.querySelector(
@@ -547,29 +532,12 @@
             return;
           }
         } catch (error) {
-          console.warn("PHP API not available, trying fallback:", error);
+          console.error("Authentication check failed:", error);
         }
 
-        // Fallback to JavaScript backend
-        while (!window.backend) {
-          await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-
-        currentSession = window.backend.getCurrentSession();
-        if (!currentSession) {
-          window.location.href = "login.html";
-          return;
-        }
-
-        // Update UI with user info
-        document.querySelector(
-          ".admin-user span"
-        ).textContent = `Welcome, ${currentSession.username}`;
-
-        // Show admin management button for supaadmin
-        if (currentSession.role === "supaadmin") {
-          addAdminManagementButton();
-        }
+        // Redirect to login if authentication failed
+        alert("Authentication failed. Please log in again.");
+        window.location.href = "login.html";
       }
 
       function addAdminManagementButton() {
@@ -583,39 +551,25 @@
 
       async function loadDashboardData() {
         try {
-          // Try PHP API first
-          try {
-            const statsResponse = await fetch(
-              "../api/shipments.php?path=stats"
-            );
-            const statsResult = await statsResponse.json();
-            if (statsResult.success) {
-              updateDashboardStats(statsResult.stats);
-            }
-
-            const shipmentsResponse = await fetch(
-              "../api/shipments.php?path=all"
-            );
-            const shipmentsResult = await shipmentsResponse.json();
-            if (shipmentsResult.success) {
-              allShipments = shipmentsResult.shipments;
-              displayShipments(allShipments);
-              return;
-            }
-          } catch (apiError) {
-            console.warn("PHP API not available, using fallback:", apiError);
+          // Load statistics
+          const statsResponse = await fetch("../api/shipments.php?path=stats");
+          const statsResult = await statsResponse.json();
+          if (statsResult.success) {
+            updateDashboardStats(statsResult.stats);
           }
 
-          // Fallback to JavaScript backend
-          if (window.backend) {
-            const stats = window.backend.getDashboardStats();
-            updateDashboardStats(stats);
-
-            allShipments = window.backend.getAllShipments();
+          // Load shipments
+          const shipmentsResponse = await fetch(
+            "../api/shipments.php?path=all"
+          );
+          const shipmentsResult = await shipmentsResponse.json();
+          if (shipmentsResult.success) {
+            allShipments = shipmentsResult.shipments;
             displayShipments(allShipments);
           }
         } catch (error) {
           console.error("Error loading dashboard data:", error);
+          alert("Error loading dashboard data. Please refresh the page.");
         }
       }
 
@@ -689,39 +643,48 @@
 
       async function adminLogout() {
         try {
-          // Try PHP API first
           await fetch("../api/admin.php?path=logout", { method: "POST" });
         } catch (error) {
-          console.warn("PHP API not available for logout:", error);
-        }
-
-        // Also clear JavaScript backend session if available
-        if (window.backend) {
-          window.backend.logout();
+          console.warn("Logout API call failed:", error);
         }
 
         window.location.href = "login.html";
       }
 
-      function editShipment(trackingNumber) {
-        const shipment = window.backend.getShipmentByTracking(trackingNumber);
-        if (!shipment) {
-          alert("Shipment not found");
-          return;
+      async function editShipment(trackingNumber) {
+        try {
+          const response = await fetch(
+            `../api/shipments.php?path=track&tracking=${encodeURIComponent(
+              trackingNumber
+            )}`
+          );
+          const result = await response.json();
+
+          if (!result.success || !result.shipment) {
+            alert("Shipment not found");
+            return;
+          }
+
+          const shipment = result.shipment;
+
+          // Populate modal with shipment data
+          document.getElementById("editTrackingNumber").value =
+            shipment.trackingNumber;
+          document.getElementById("editClient").value = shipment.client;
+          document.getElementById("editDescription").value =
+            shipment.description;
+          document.getElementById("editOrigin").value = shipment.origin;
+          document.getElementById("editDestination").value =
+            shipment.destination;
+          document.getElementById("editStatus").value = shipment.status;
+          document.getElementById("editValue").value = shipment.value;
+          document.getElementById("editETA").value = shipment.eta;
+
+          document.getElementById("editShipmentModal").style.display = "flex";
+        } catch (error) {
+          console.error("Error loading shipment for edit:", error);
+          alert("Error loading shipment data");
         }
-
-        // Populate modal with shipment data
-        document.getElementById("editTrackingNumber").value =
-          shipment.trackingNumber;
-        document.getElementById("editClient").value = shipment.client;
-        document.getElementById("editDescription").value = shipment.description;
-        document.getElementById("editOrigin").value = shipment.origin;
-        document.getElementById("editDestination").value = shipment.destination;
-        document.getElementById("editStatus").value = shipment.status;
-        document.getElementById("editValue").value = shipment.value;
-        document.getElementById("editETA").value = shipment.eta;
-
-        document.getElementById("editShipmentModal").style.display = "flex";
       }
 
       function updateStatus(trackingNumber) {
@@ -737,13 +700,14 @@
         document.getElementById("updateStatusModal").style.display = "none";
       }
 
-      function saveShipment(event) {
+      async function saveShipment(event) {
         event.preventDefault();
 
         try {
           const trackingNumber =
             document.getElementById("editTrackingNumber").value;
           const updateData = {
+            trackingNumber: trackingNumber,
             client: document.getElementById("editClient").value,
             description: document.getElementById("editDescription").value,
             origin: document.getElementById("editOrigin").value,
@@ -753,20 +717,31 @@
             eta: document.getElementById("editETA").value,
           };
 
-          window.backend.updateShipment(
-            trackingNumber,
-            updateData,
-            currentSession
-          );
-          alert("Shipment updated successfully!");
-          closeEditModal();
-          loadDashboardData(); // Refresh data
+          const response = await fetch("../api/shipments.php", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updateData),
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            alert("Shipment updated successfully!");
+            closeEditModal();
+            loadDashboardData(); // Refresh data
+          } else {
+            alert(
+              "Error updating shipment: " + (result.message || "Unknown error")
+            );
+          }
         } catch (error) {
+          console.error("Error updating shipment:", error);
           alert("Error updating shipment: " + error.message);
         }
       }
 
-      function saveStatusUpdate(event) {
+      async function saveStatusUpdate(event) {
         event.preventDefault();
 
         try {
@@ -774,49 +749,98 @@
             "statusTrackingNumber"
           ).value;
           const statusData = {
+            trackingNumber: trackingNumber,
             status: document.getElementById("newStatus").value,
             location: document.getElementById("statusLocation").value,
             description: document.getElementById("statusNotes").value,
             notes: document.getElementById("statusNotes").value,
           };
 
-          window.backend.updateShipmentStatus(
-            trackingNumber,
-            statusData,
-            currentSession
+          const response = await fetch(
+            "../api/shipments.php?path=update-status",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(statusData),
+            }
           );
-          alert("Status updated successfully!");
-          closeStatusModal();
-          loadDashboardData(); // Refresh data
+
+          const result = await response.json();
+          if (result.success) {
+            alert("Status updated successfully!");
+            closeStatusModal();
+            loadDashboardData(); // Refresh data
+          } else {
+            alert(
+              "Error updating status: " + (result.message || "Unknown error")
+            );
+          }
         } catch (error) {
+          console.error("Error updating status:", error);
           alert("Error updating status: " + error.message);
         }
       }
 
-      function deleteShipment(trackingNumber) {
+      async function deleteShipment(trackingNumber) {
         if (
           confirm(
             `Are you sure you want to delete shipment ${trackingNumber}? This action cannot be undone.`
           )
         ) {
           try {
-            window.backend.deleteShipment(trackingNumber, currentSession);
-            alert("Shipment deleted successfully!");
-            loadDashboardData(); // Refresh data
+            const response = await fetch(
+              `../api/shipments.php?tracking=${encodeURIComponent(
+                trackingNumber
+              )}`,
+              {
+                method: "DELETE",
+              }
+            );
+
+            const result = await response.json();
+            if (result.success) {
+              alert("Shipment deleted successfully!");
+              loadDashboardData(); // Refresh data
+            } else {
+              alert(
+                "Error deleting shipment: " +
+                  (result.message || "Unknown error")
+              );
+            }
           } catch (error) {
+            console.error("Error deleting shipment:", error);
             alert("Error deleting shipment: " + error.message);
           }
         }
       }
 
       function filterShipments(searchTerm) {
-        const filtered = window.backend.searchShipments(searchTerm);
+        let filtered = allShipments;
+
+        if (searchTerm) {
+          const searchLower = searchTerm.toLowerCase();
+          filtered = allShipments.filter(
+            (s) =>
+              s.trackingNumber.toLowerCase().includes(searchLower) ||
+              s.client.toLowerCase().includes(searchLower) ||
+              s.description.toLowerCase().includes(searchLower) ||
+              s.origin.toLowerCase().includes(searchLower) ||
+              s.destination.toLowerCase().includes(searchLower)
+          );
+        }
+
         displayShipments(filtered);
       }
 
       function filterByStatus(status) {
-        const filters = status ? { status: status } : {};
-        const filtered = window.backend.searchShipments("", filters);
+        let filtered = allShipments;
+
+        if (status) {
+          filtered = allShipments.filter((s) => s.status === status);
+        }
+
         displayShipments(filtered);
       }
 
@@ -833,7 +857,11 @@
       }
 
       function generateReport() {
-        const data = window.backend.exportData("shipments");
+        const data = {
+          shipments: allShipments,
+          exportedAt: new Date().toISOString(),
+          type: "shipments_report",
+        };
         const blob = new Blob([JSON.stringify(data, null, 2)], {
           type: "application/json",
         });
@@ -850,7 +878,11 @@
       }
 
       function exportData() {
-        const data = window.backend.exportData("all");
+        const data = {
+          shipments: allShipments,
+          exportedAt: new Date().toISOString(),
+          type: "full_export",
+        };
         const blob = new Blob([JSON.stringify(data, null, 2)], {
           type: "application/json",
         });

@@ -145,13 +145,13 @@
             "description": "nbfvdcsx",
             "origin": "nbfvdc",
             "destination": " nbfvcx",
-            "status": "storage",
+            "status": "preparing",
             "value": 400,
             "currency": "USD",
             "serviceType": "Express International Shipping",
             "eta": "2025-07-31",
             "createdAt": "2025-07-31T12:51:38+00:00",
-            "updatedAt": "2025-07-31T12:51:38+00:00",
+            "updatedAt": "2025-07-31T14:21:37+00:00",
             "timeline": [
                 {
                     "status": "storage",
@@ -159,10 +159,17 @@
                     "timestamp": "2025-07-31T12:51:38+00:00",
                     "description": "Shipment created",
                     "notes": "Initial shipment entry"
+                },
+                {
+                    "status": "preparing",
+                    "location": "",
+                    "timestamp": "2025-07-31T14:21:37+00:00",
+                    "description": "",
+                    "notes": ""
                 }
             ]
         }
     ],
     "nextTrackingId": 11225,
-    "lastUpdated": "2025-07-31T12:51:38+00:00"
+    "lastUpdated": "2025-07-31T14:21:37+00:00"
 }

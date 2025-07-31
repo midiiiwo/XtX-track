@@ -106,7 +106,6 @@
     </div>
 
     <script src="../script.js"></script>
-    <script src="../js/backend.js"></script>
     <script>
       async function adminLogin(event) {
         event.preventDefault();
@@ -114,7 +113,6 @@
         const password = document.getElementById("password").value;
 
         try {
-          // Try PHP API first
           const response = await fetch("../api/admin.php?path=login", {
             method: "POST",
             headers: {
@@ -128,32 +126,12 @@
           if (result.success) {
             window.location.href = "dashboard.html";
             return;
+          } else {
+            alert("Invalid credentials. Please try again.");
           }
-        } catch (error) {
-          console.warn("PHP API not available, trying fallback:", error);
-        }
-
-        try {
-          // Fallback to JavaScript backend
-          if (!window.backend) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
-
-          if (window.backend) {
-            const session = window.backend.authenticateAdmin(
-              username,
-              password
-            );
-            if (session) {
-              window.location.href = "dashboard.html";
-              return;
-            }
-          }
-
-          alert("Invalid credentials. Please try again.");
         } catch (error) {
           console.error("Login error:", error);
-          alert("Login failed. Please try again.");
+          alert("Login failed. Please check your connection and try again.");
         }
       }
 
