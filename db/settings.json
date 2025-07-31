@@ -1,0 +1,43 @@
+{
+  "app": {
+    "name": "Athena Security Tracking System",
+    "version": "1.0.0",
+    "trackingIdPrefix": "GS",
+    "trackingIdFormat": "GS-YYYY-XXXXXX"
+  },
+  "statuses": [
+    {
+      "key": "storage",
+      "label": "In Storage",
+      "description": "Item is securely stored in vault",
+      "color": "#6b7280"
+    },
+    {
+      "key": "preparing",
+      "label": "Preparing for Shipment",
+      "description": "Documentation and customs clearance in progress",
+      "color": "#f59e0b"
+    },
+    {
+      "key": "transit",
+      "label": "In Transit",
+      "description": "Item is being transported to destination",
+      "color": "#3b82f6"
+    },
+    {
+      "key": "delivered",
+      "label": "Delivered",
+      "description": "Item has been successfully delivered",
+      "color": "#10b981"
+    }
+  ],
+  "currencies": ["USD", "EUR", "GBP", "CHF", "SGD", "AED"],
+  "serviceTypes": [
+    "Express International Shipping",
+    "Standard International Shipping",
+    "Premium Secure Transport",
+    "Economy Shipping",
+    "Same Day Delivery"
+  ],
+  "lastUpdated": "2025-01-31T00:00:00.000Z"
+}

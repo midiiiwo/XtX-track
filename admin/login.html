@@ -106,19 +106,29 @@
     </div>
 
     <script src="../script.js"></script>
+    <script src="../js/backend.js"></script>
     <script>
-      function adminLogin(event) {
+      async function adminLogin(event) {
         event.preventDefault();
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
 
-        if (username === "admin" && password === "goldsecure2025") {
-          localStorage.setItem("adminLoggedIn", "true");
-          localStorage.setItem("adminUsername", username);
+        try {
+          // Wait for backend to initialize
+          if (!window.backend) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+          }
 
-          window.location.href = "dashboard.html";
-        } else {
-          alert("Invalid credentials. Please try again.");
+          const session = window.backend.authenticateAdmin(username, password);
+
+          if (session) {
+            window.location.href = "dashboard.html";
+          } else {
+            alert("Invalid credentials. Please try again.");
+          }
+        } catch (error) {
+          console.error("Login error:", error);
+          alert("Login failed. Please try again.");
         }
       }
 

@@ -353,29 +353,290 @@
       </div>
     </div>
 
-    <script src="../script.js"></script>
+    <!-- New Shipment Modal -->
+    <div class="modal" id="newShipmentModal" style="display: none">
+      <div class="modal-content large">
+        <div class="modal-header">
+          <h2>Create New Shipment</h2>
+          <button class="modal-close" onclick="closeNewShipmentModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <form onsubmit="saveNewShipment(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="newClient">Client Name</label>
+                <input type="text" id="newClient" required />
+              </div>
+              <div class="form-group">
+                <label for="newDescription">Description</label>
+                <input type="text" id="newDescription" required />
+              </div>
+              <div class="form-group">
+                <label for="newOrigin">Origin</label>
+                <input type="text" id="newOrigin" required />
+              </div>
+              <div class="form-group">
+                <label for="newDestination">Destination</label>
+                <input type="text" id="newDestination" required />
+              </div>
+              <div class="form-group">
+                <label for="newStatus">Initial Status</label>
+                <select id="newStatus" required>
+                  <option value="storage">In Storage</option>
+                  <option value="preparing">Preparing</option>
+                  <option value="transit">In Transit</option>
+                  <option value="delivered">Delivered</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="newValue">Value ($)</label>
+                <input
+                  type="number"
+                  id="newValue"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="newCurrency">Currency</label>
+                <select id="newCurrency" required>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CHF">CHF</option>
+                  <option value="SGD">SGD</option>
+                  <option value="AED">AED</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="newServiceType">Service Type</label>
+                <select id="newServiceType" required>
+                  <option value="Express International Shipping">
+                    Express International Shipping
+                  </option>
+                  <option value="Standard International Shipping">
+                    Standard International Shipping
+                  </option>
+                  <option value="Premium Secure Transport">
+                    Premium Secure Transport
+                  </option>
+                  <option value="Economy Shipping">Economy Shipping</option>
+                  <option value="Same Day Delivery">Same Day Delivery</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="newETA">Expected Delivery Date</label>
+                <input type="date" id="newETA" required />
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button
+                type="button"
+                onclick="closeNewShipmentModal()"
+                class="btn btn-secondary"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Create Shipment
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script>
-      if (!localStorage.getItem("adminLoggedIn")) {
-        window.location.href = "login.html";
+      function closeNewShipmentModal() {
+        document.getElementById("newShipmentModal").style.display = "none";
+        document
+          .getElementById("newShipmentModal")
+          .querySelector("form")
+          .reset();
+      }
+
+      function saveNewShipment(event) {
+        event.preventDefault();
+
+        try {
+          const shipmentData = {
+            client: document.getElementById("newClient").value,
+            description: document.getElementById("newDescription").value,
+            origin: document.getElementById("newOrigin").value,
+            destination: document.getElementById("newDestination").value,
+            status: document.getElementById("newStatus").value,
+            value: parseFloat(document.getElementById("newValue").value),
+            currency: document.getElementById("newCurrency").value,
+            serviceType: document.getElementById("newServiceType").value,
+            eta: document.getElementById("newETA").value,
+          };
+
+          const newShipment = window.backend.createShipment(
+            shipmentData,
+            currentSession
+          );
+          alert(
+            `Shipment created successfully! Tracking Number: ${newShipment.trackingNumber}`
+          );
+          closeNewShipmentModal();
+          loadDashboardData(); // Refresh data
+        } catch (error) {
+          alert("Error creating shipment: " + error.message);
+        }
+      }
+    </script>
+
+    <script src="../script.js"></script>
+    <script src="../js/backend.js"></script>
+    <script>
+      let currentSession = null;
+      let allShipments = [];
+
+      // Check authentication on page load
+      document.addEventListener("DOMContentLoaded", async function () {
+        await checkAuth();
+        await loadDashboardData();
+      });
+
+      async function checkAuth() {
+        // Wait for backend to initialize
+        while (!window.backend) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        currentSession = window.backend.getCurrentSession();
+        if (!currentSession) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        // Update UI with user info
+        document.querySelector(
+          ".admin-user span"
+        ).textContent = `Welcome, ${currentSession.username}`;
+
+        // Show admin management button for supaadmin
+        if (currentSession.role === "supaadmin") {
+          addAdminManagementButton();
+        }
+      }
+
+      function addAdminManagementButton() {
+        const quickActions = document.querySelector(".action-buttons");
+        const adminBtn = document.createElement("button");
+        adminBtn.textContent = "Manage Admins";
+        adminBtn.className = "btn btn-secondary";
+        adminBtn.onclick = showAdminManagement;
+        quickActions.appendChild(adminBtn);
+      }
+
+      async function loadDashboardData() {
+        try {
+          // Load dashboard stats
+          const stats = window.backend.getDashboardStats();
+          updateDashboardStats(stats);
+
+          // Load shipments
+          allShipments = window.backend.getAllShipments();
+          displayShipments(allShipments);
+        } catch (error) {
+          console.error("Error loading dashboard data:", error);
+        }
+      }
+
+      function updateDashboardStats(stats) {
+        document.querySelector(
+          ".stat-card:nth-child(1) .stat-number"
+        ).textContent = stats.totalShipments;
+        document.querySelector(
+          ".stat-card:nth-child(2) .stat-number"
+        ).textContent = stats.inTransit;
+        document.querySelector(
+          ".stat-card:nth-child(3) .stat-number"
+        ).textContent = stats.delivered;
+        document.querySelector(
+          ".stat-card:nth-child(4) .stat-number"
+        ).textContent = `${(stats.totalValue / 1000000).toFixed(1)}M`;
+      }
+
+      function displayShipments(shipments) {
+        const tbody = document.getElementById("shipmentsTableBody");
+        tbody.innerHTML = "";
+
+        shipments.forEach((shipment) => {
+          const row = createShipmentRow(shipment);
+          tbody.appendChild(row);
+        });
+      }
+
+      function createShipmentRow(shipment) {
+        const row = document.createElement("tr");
+        const statusClass = shipment.status.replace(" ", "-").toLowerCase();
+        const statusLabel = getStatusLabel(shipment.status);
+
+        row.innerHTML = `
+          <td><strong>${shipment.trackingNumber}</strong></td>
+          <td>${shipment.client}</td>
+          <td>${shipment.description}</td>
+          <td>${shipment.origin}</td>
+          <td>${shipment.destination}</td>
+          <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+          <td>${shipment.value.toLocaleString()}</td>
+          <td>${
+            shipment.status === "delivered"
+              ? "Delivered"
+              : new Date(shipment.eta).toLocaleDateString()
+          }</td>
+          <td>
+            <button onclick="editShipment('${
+              shipment.trackingNumber
+            }')" class="btn-action">Edit</button>
+            <button onclick="updateStatus('${
+              shipment.trackingNumber
+            }')" class="btn-action">Update</button>
+            <button onclick="deleteShipment('${
+              shipment.trackingNumber
+            }')" class="btn-action btn-danger">Delete</button>
+          </td>
+        `;
+        return row;
+      }
+
+      function getStatusLabel(status) {
+        const statusMap = {
+          storage: "In Storage",
+          preparing: "Preparing",
+          transit: "In Transit",
+          delivered: "Delivered",
+        };
+        return statusMap[status] || status;
       }
 
       function adminLogout() {
-        localStorage.removeItem("adminLoggedIn");
-        localStorage.removeItem("adminUsername");
+        window.backend.logout();
         window.location.href = "login.html";
       }
 
       function editShipment(trackingNumber) {
-        // Populate modal with shipment data (demo data)
-        document.getElementById("editTrackingNumber").value = trackingNumber;
-        document.getElementById("editClient").value = "Marcus Chen";
-        document.getElementById("editDescription").value =
-          "24k Gold Bars (5kg)";
-        document.getElementById("editOrigin").value = "Accra, GH";
-        document.getElementById("editDestination").value = "London, UK";
-        document.getElementById("editStatus").value = "transit";
-        document.getElementById("editValue").value = "325000";
-        document.getElementById("editETA").value = "2025-07-27";
+        const shipment = window.backend.getShipmentByTracking(trackingNumber);
+        if (!shipment) {
+          alert("Shipment not found");
+          return;
+        }
+
+        // Populate modal with shipment data
+        document.getElementById("editTrackingNumber").value =
+          shipment.trackingNumber;
+        document.getElementById("editClient").value = shipment.client;
+        document.getElementById("editDescription").value = shipment.description;
+        document.getElementById("editOrigin").value = shipment.origin;
+        document.getElementById("editDestination").value = shipment.destination;
+        document.getElementById("editStatus").value = shipment.status;
+        document.getElementById("editValue").value = shipment.value;
+        document.getElementById("editETA").value = shipment.eta;
 
         document.getElementById("editShipmentModal").style.display = "flex";
       }
@@ -395,42 +656,135 @@
 
       function saveShipment(event) {
         event.preventDefault();
-        alert("Shipment updated successfully!");
-        closeEditModal();
+
+        try {
+          const trackingNumber =
+            document.getElementById("editTrackingNumber").value;
+          const updateData = {
+            client: document.getElementById("editClient").value,
+            description: document.getElementById("editDescription").value,
+            origin: document.getElementById("editOrigin").value,
+            destination: document.getElementById("editDestination").value,
+            status: document.getElementById("editStatus").value,
+            value: parseFloat(document.getElementById("editValue").value),
+            eta: document.getElementById("editETA").value,
+          };
+
+          window.backend.updateShipment(
+            trackingNumber,
+            updateData,
+            currentSession
+          );
+          alert("Shipment updated successfully!");
+          closeEditModal();
+          loadDashboardData(); // Refresh data
+        } catch (error) {
+          alert("Error updating shipment: " + error.message);
+        }
       }
 
       function saveStatusUpdate(event) {
         event.preventDefault();
-        alert("Status updated successfully!");
-        closeStatusModal();
+
+        try {
+          const trackingNumber = document.getElementById(
+            "statusTrackingNumber"
+          ).value;
+          const statusData = {
+            status: document.getElementById("newStatus").value,
+            location: document.getElementById("statusLocation").value,
+            description: document.getElementById("statusNotes").value,
+            notes: document.getElementById("statusNotes").value,
+          };
+
+          window.backend.updateShipmentStatus(
+            trackingNumber,
+            statusData,
+            currentSession
+          );
+          alert("Status updated successfully!");
+          closeStatusModal();
+          loadDashboardData(); // Refresh data
+        } catch (error) {
+          alert("Error updating status: " + error.message);
+        }
+      }
+
+      function deleteShipment(trackingNumber) {
+        if (
+          confirm(
+            `Are you sure you want to delete shipment ${trackingNumber}? This action cannot be undone.`
+          )
+        ) {
+          try {
+            window.backend.deleteShipment(trackingNumber, currentSession);
+            alert("Shipment deleted successfully!");
+            loadDashboardData(); // Refresh data
+          } catch (error) {
+            alert("Error deleting shipment: " + error.message);
+          }
+        }
       }
 
       function filterShipments(searchTerm) {
-        console.log("Searching for:", searchTerm);
+        const filtered = window.backend.searchShipments(searchTerm);
+        displayShipments(filtered);
       }
 
       function filterByStatus(status) {
-        console.log("Filtering by status:", status);
+        const filters = status ? { status: status } : {};
+        const filtered = window.backend.searchShipments("", filters);
+        displayShipments(filtered);
       }
 
       function showNewShipment() {
-        alert("New Shipment form would open here");
+        document.getElementById("newShipmentModal").style.display = "flex";
+      }
+
+      function showAdminManagement() {
+        window.open("manage-admins.html", "_blank");
       }
 
       function bulkUpdate() {
-        alert("Bulk update functionality would be available here");
+        alert("Bulk update functionality coming soon");
       }
 
       function generateReport() {
-        alert("Report generation would start here");
+        const data = window.backend.exportData("shipments");
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `shipments-report-${
+          new Date().toISOString().split("T")[0]
+        }.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       }
 
       function exportData() {
-        alert("Data export would begin here");
+        const data = window.backend.exportData("all");
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `xtx-track-export-${
+          new Date().toISOString().split("T")[0]
+        }.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       }
 
       function generateInvoice(trackingNumber) {
-        alert("Invoice generated for " + trackingNumber);
+        alert("Invoice generation for " + trackingNumber + " coming soon");
       }
     </script>
   </body>

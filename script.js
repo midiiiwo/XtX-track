@@ -93,18 +93,60 @@ const sampleTrackingData = {
     client: "James Rodriguez",
   },
 };
-function trackShipment() {
+async function trackShipment() {
   const trackingNumber = document.getElementById("trackingNumber").value.trim();
   if (!trackingNumber) {
     alert("Please enter a tracking number");
     return;
   }
-  const trackingData = sampleTrackingData[trackingNumber];
-  if (trackingData) {
-    displayTrackingResults(trackingData);
+
+  // Wait for backend to initialize if it exists
+  if (window.backend) {
+    while (!window.backend) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    const shipment = window.backend.getShipmentByTracking(trackingNumber);
+    if (shipment) {
+      const trackingData = convertShipmentToTrackingData(shipment);
+      displayTrackingResults(trackingData);
+    } else {
+      displayTrackingError();
+    }
   } else {
-    displayTrackingError();
+    // Fallback to sample data if backend not available
+    const trackingData = sampleTrackingData[trackingNumber];
+    if (trackingData) {
+      displayTrackingResults(trackingData);
+    } else {
+      displayTrackingError();
+    }
   }
+}
+
+function convertShipmentToTrackingData(shipment) {
+  const statusMap = {
+    storage: "In Storage",
+    preparing: "Preparing for Shipment",
+    transit: "In Transit",
+    delivered: "Delivered",
+  };
+
+  return {
+    trackingNumber: shipment.trackingNumber,
+    description: shipment.description,
+    origin: shipment.origin,
+    destination: shipment.destination,
+    status: statusMap[shipment.status] || shipment.status,
+    eta:
+      shipment.status === "delivered"
+        ? "Delivered"
+        : new Date(shipment.eta).toLocaleDateString(),
+    value: `${shipment.value.toLocaleString()}`,
+    service: shipment.serviceType,
+    client: shipment.client,
+    timeline: shipment.timeline,
+  };
 }
 function demoTrack(trackingNumber) {
   document.getElementById("trackingNumber").value = trackingNumber;
