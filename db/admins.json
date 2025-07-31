@@ -6,7 +6,7 @@
             "password": "kwansa",
             "role": "supaadmin",
             "createdAt": "2025-01-31T00:00:00.000Z",
-            "lastLogin": "2025-07-31T14:21:25+00:00",
+            "lastLogin": "2025-07-31T14:41:00+00:00",
             "active": true,
             "permissions": [
                 "manage_shipments",
@@ -17,5 +17,5 @@
             ]
         }
     ],
-    "lastUpdated": "2025-07-31T14:21:25+00:00"
+    "lastUpdated": "2025-07-31T14:41:00+00:00"
 }
