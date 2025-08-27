@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
       trackButton.addEventListener("click", function () {
         const trackingNumber = trackInput.value.trim();
         if (trackingNumber) {
-          window.location.href = `track.html?tracking=${encodeURIComponent(
+          window.location.href = `track.php?tracking=${encodeURIComponent(
             trackingNumber
           )}`;
         } else {
@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
   }
-  if (window.location.pathname.includes("track.html")) {
+  if (window.location.pathname.includes("track.php")) {
     const urlParams = new URLSearchParams(window.location.search);
     const trackingNumber = urlParams.get("tracking");
     if (trackingNumber) {

@@ -1,21 +1,31 @@
 {
-    "admins": [
-        {
-            "id": "1",
-            "username": "midiiwo",
-            "password": "kwansa",
-            "role": "supaadmin",
-            "createdAt": "2025-01-31T00:00:00.000Z",
-            "lastLogin": "2025-07-31T14:41:00+00:00",
-            "active": true,
-            "permissions": [
-                "manage_shipments",
-                "manage_admins",
-                "view_reports",
-                "export_data",
-                "system_settings"
-            ]
-        }
-    ],
-    "lastUpdated": "2025-07-31T14:41:00+00:00"
+  "admins": [
+    {
+      "id": "1",
+      "username": "1Qaz2Wsx",
+      "password": "12321232111",
+      "role": "supaadmin",
+      "createdAt": "2025-01-31T00:00:00.000Z",
+      "lastLogin": "2025-08-27T17:17:17+00:00",
+      "active": true,
+      "permissions": [
+        "manage_shipments",
+        "manage_admins",
+        "view_reports",
+        "export_data",
+        "system_settings"
+      ]
+    },
+    {
+      "id": "2",
+      "username": "Dino",
+      "password": "1234567890",
+      "role": "admin",
+      "createdAt": "2025-08-27T17:18:01+00:00",
+      "lastLogin": null,
+      "active": true,
+      "permissions": ["manage_shipments", "view_reports"]
+    }
+  ],
+  "lastUpdated": "2025-08-27T17:18:01+00:00"
 }

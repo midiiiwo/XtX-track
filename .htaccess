@@ -17,7 +17,7 @@ RewriteRule ^api/([^/]+)\.php$ api/$1.php [L,QSA]
 
 # Handle index file
 
-DirectoryIndex index.html
+DirectoryIndex index.php
 
 # Security headers
 

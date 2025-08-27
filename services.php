@@ -18,11 +18,11 @@
           <!-- <span class="logo-text">Athena</span> -->
         </div>
         <ul class="nav-menu">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="about.html" class="nav-link">About</a></li>
-          <li><a href="services.html" class="nav-link active">Services</a></li>
-          <li><a href="track.html" class="nav-link">Track</a></li>
-          <li><a href="contact.html" class="nav-link">Contact</a></li>
+          <li><a href="index.php" class="nav-link">Home</a></li>
+          <li><a href="about.php" class="nav-link">About</a></li>
+          <li><a href="services.php" class="nav-link active">Services</a></li>
+          <li><a href="track.php" class="nav-link">Track</a></li>
+          <li><a href="contact.php" class="nav-link">Contact</a></li>
         </ul>
         <div class="nav-toggle">
           <span></span>
@@ -203,8 +203,8 @@
               quote tailored to your specific needs.
             </p>
             <div class="cta-buttons">
-              <a href="contact.html" class="btn btn-primary">Get a Quote</a>
-              <a href="track.html" class="btn btn-secondary">Track Shipment</a>
+              <a href="contact.php" class="btn btn-primary">Get a Quote</a>
+              <a href="track.php" class="btn btn-secondary">Track Shipment</a>
             </div>
           </div>
         </div>
@@ -225,20 +225,20 @@
           <div class="footer-section">
             <h4>Services</h4>
             <ul>
-              <li><a href="services.html">Secure Storage</a></li>
-              <li><a href="services.html">Global Shipping</a></li>
-              <li><a href="services.html">Inventory Management</a></li>
-              <li><a href="services.html">Custom Insurance</a></li>
+              <li><a href="services.php">Secure Storage</a></li>
+              <li><a href="services.php">Global Shipping</a></li>
+              <li><a href="services.php">Inventory Management</a></li>
+              <li><a href="services.php">Custom Insurance</a></li>
             </ul>
           </div>
           <div class="footer-section">
             <h4>Company</h4>
             <ul>
-              <li><a href="about.html">About Us</a></li>
-              <li><a href="contact.html">Contact</a></li>
-              <li><a href="track.html">Track Shipment</a></li>
+              <li><a href="about.php">About Us</a></li>
+              <li><a href="contact.php">Contact</a></li>
+              <li><a href="track.php">Track Shipment</a></li>
               <li>
-                <a href="#" onclick="window.open('admin/login.html', '_blank')"
+                <a href="#" onclick="window.open('admin/login.php', '_blank')"
                   >Admin Portal</a
                 >
               </li>

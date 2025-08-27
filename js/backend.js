@@ -65,8 +65,8 @@ class LocalBackend {
           admins: [
             {
               id: "1",
-              username: "midiiwo",
-              password: "kwansa",
+              username: "1Qaz2Wsx",
+              password: "12321232111",
               role: "supaadmin",
               createdAt: new Date().toISOString(),
               lastLogin: null,

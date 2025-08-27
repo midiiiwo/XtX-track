@@ -209,7 +209,7 @@
             // Only supaadmin can access this page
             if (currentSession.role !== "supaadmin") {
               alert("Unauthorized: Only super admin can manage administrators");
-              window.location.href = "dashboard.html";
+              window.location.href = "dashboard.php";
               return;
             }
             return;
@@ -220,7 +220,7 @@
 
         // Redirect to login if authentication failed
         alert("Authentication failed. Please log in again.");
-        window.location.href = "login.html";
+        window.location.href = "login.php";
       }
 
       async function loadAdminsData() {
@@ -404,7 +404,7 @@
         window.close();
         // If window.close() doesn't work (some browsers), redirect
         setTimeout(() => {
-          window.location.href = "dashboard.html";
+          window.location.href = "dashboard.php";
         }, 100);
       }
 
@@ -415,7 +415,7 @@
           console.warn("Logout API call failed:", error);
         }
 
-        window.location.href = "login.html";
+        window.location.href = "login.php";
       }
     </script>
   </body>

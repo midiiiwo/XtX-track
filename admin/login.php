@@ -70,7 +70,7 @@
 
         <div class="login-footer">
           <p>© 2025 Athena Security. All rights reserved.</p>
-          <p><a href="../index.html">← Back to Main Site</a></p>
+          <p><a href="../index.php">← Back to Main Site</a></p>
         </div>
       </div>
     </div>
@@ -124,7 +124,7 @@
           const result = await response.json();
 
           if (result.success) {
-            window.location.href = "dashboard.html";
+            window.location.href = "dashboard.php";
             return;
           } else {
             alert("Invalid credentials. Please try again.");

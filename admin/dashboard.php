@@ -537,7 +537,7 @@
 
         // Redirect to login if authentication failed
         alert("Authentication failed. Please log in again.");
-        window.location.href = "login.html";
+        window.location.href = "login.php";
       }
 
       function addAdminManagementButton() {
@@ -648,7 +648,7 @@
           console.warn("Logout API call failed:", error);
         }
 
-        window.location.href = "login.html";
+        window.location.href = "login.php";
       }
 
       async function editShipment(trackingNumber) {
@@ -849,7 +849,7 @@
       }
 
       function showAdminManagement() {
-        window.open("manage-admins.html", "_blank");
+        window.open("manage-admins.php", "_blank");
       }
 
       function bulkUpdate() {
